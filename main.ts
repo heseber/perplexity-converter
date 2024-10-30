@@ -5,9 +5,19 @@ interface UrlMap {
 	[key: string]: string;
 }
 
+interface PerplexityConverterSettings {
+	sourceHeaders: string[];
+}
+
+const DEFAULT_SETTINGS: PerplexityConverterSettings = {
+	sourceHeaders: ['Quellen', 'Sources', 'Citations:']
+}
+
 export default class PerplexityConverter extends Plugin {
+	settings: PerplexityConverterSettings;
 
 	async onload() {
+		await this.loadSettings();
 
 		// Register the command
 		this.addCommand({
@@ -41,11 +51,8 @@ export default class PerplexityConverter extends Plugin {
 		// Get the lines in the text
 		const lines: string[] = text.split('\n');
 
-		// Define source section headers
-		const sourceHeaders: string[] = ['Quellen', 'Sources', 'Citations:'];
-
 		// Check for source section headers. If not found, return text unmodified.
-		if (!lines.some(line => sourceHeaders.includes(line.trim()))) {
+		if (!lines.some(line => this.settings.sourceHeaders.includes(line.trim()))) {
 			return text;
 		}
 
@@ -55,7 +62,7 @@ export default class PerplexityConverter extends Plugin {
 
 		for (const line of lines) {
 			
-			if (sourceHeaders.includes(line)) {
+			if (this.settings.sourceHeaders.includes(line)) {
 				inSourcesSection = true;
 				continue;
 			}
@@ -81,7 +88,7 @@ export default class PerplexityConverter extends Plugin {
 
 		for (const line of lines) {
 			
-			if (sourceHeaders.includes(line)) {
+			if (this.settings.sourceHeaders.includes(line)) {
 				inSourcesSection = true;
 				modifiedLines.push(line);
 				continue;
@@ -130,5 +137,40 @@ export default class PerplexityConverter extends Plugin {
 
         return modifiedLines.join('\n');
     }
+		
+	async loadSettings() {
+		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+	}
 	
+	async saveSettings() {
+		await this.saveData(this.settings);
+	}
+}
+
+
+
+class PerplexityConverterSettingTab extends PluginSettingTab {
+	plugin: PerplexityConverter;
+
+	constructor(app: App, plugin: PerplexityConverter) {
+		super(app, plugin);
+		this.plugin = plugin;
+	}
+
+	display(): void {
+		const {containerEl} = this;
+
+		containerEl.empty();
+
+		new Setting(containerEl)
+			.setName('References start line tags')
+			.setDesc('Strings (complete lines) that indicate the start of the references section')
+			.addText(text => text
+				.setPlaceholder('Enter your start line tags')
+				.setValue(this.plugin.settings.sourceHeaders.join("\n"))
+				.onChange(async (value) => {
+					this.plugin.settings.sourceHeaders = value.split('\n').filter(item => item.trim());;
+					await this.plugin.saveSettings();
+				}));
+	}
 }
