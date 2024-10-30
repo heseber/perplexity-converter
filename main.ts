@@ -34,11 +34,15 @@ export default class PerplexityConverter extends Plugin {
 				editor.replaceSelection(processedText);
 			}
 		});
+
+		// This adds a settings tab so the user can configure various aspects of the plugin
+		this.addSettingTab(new PerplexityConverterSettingTab(this.app, this));
 	}
 
 	onunload() {
 
 	}
+
 
     // Dummy text processing function
     private process_text(text: string): string {
