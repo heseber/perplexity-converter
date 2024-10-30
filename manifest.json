@@ -1,11 +1,10 @@
 {
-	"id": "sample-plugin",
-	"name": "Sample Plugin",
-	"version": "1.0.0",
-	"minAppVersion": "0.15.0",
-	"description": "Demonstrates some of the capabilities of the Obsidian API.",
-	"author": "Obsidian",
-	"authorUrl": "https://obsidian.md",
-	"fundingUrl": "https://obsidian.md/pricing",
+	"id": "perplexity-converter",
+	"name": "Perplexity Converter",
+	"version": "0.100",
+	"minAppVersion": "0.1.0",
+	"description": "Fixes source references in Perplexity output pasted into Obsidian.",
+	"author": "Henrik Seidel",
+	"authorUrl": "https://github.com/heseber/",
 	"isDesktopOnly": false
 }
