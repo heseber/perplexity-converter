@@ -1,134 +1,134 @@
 import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
 
-// Remember to rename these classes and interfaces!
-
-interface MyPluginSettings {
-	mySetting: string;
+// Interface for storing URL mappings
+interface UrlMap {
+	[key: string]: string;
 }
 
-const DEFAULT_SETTINGS: MyPluginSettings = {
-	mySetting: 'default'
-}
-
-export default class MyPlugin extends Plugin {
-	settings: MyPluginSettings;
+export default class PerplexityConverter extends Plugin {
 
 	async onload() {
-		await this.loadSettings();
 
-		// This creates an icon in the left ribbon.
-		const ribbonIconEl = this.addRibbonIcon('dice', 'Sample Plugin', (evt: MouseEvent) => {
-			// Called when the user clicks the icon.
-			new Notice('This is a notice!');
-		});
-		// Perform additional things with the ribbon
-		ribbonIconEl.addClass('my-plugin-ribbon-class');
-
-		// This adds a status bar item to the bottom of the app. Does not work on mobile apps.
-		const statusBarItemEl = this.addStatusBarItem();
-		statusBarItemEl.setText('Status Bar Text');
-
-		// This adds a simple command that can be triggered anywhere
+		// Register the command
 		this.addCommand({
-			id: 'open-sample-modal-simple',
-			name: 'Open sample modal (simple)',
-			callback: () => {
-				new SampleModal(this.app).open();
+			id: 'process-selected-text',
+			name: 'Process Selected Text',
+			editorCallback: (editor: Editor) => {
+				// Get the selected text
+				const selectedText = editor.getSelection();
+				
+				// Process the text
+				const processedText = this.process_text(selectedText);
+				
+				// Replace the selection with processed text
+				editor.replaceSelection(processedText);
 			}
 		});
-		// This adds an editor command that can perform some operation on the current editor instance
-		this.addCommand({
-			id: 'sample-editor-command',
-			name: 'Sample editor command',
-			editorCallback: (editor: Editor, view: MarkdownView) => {
-				console.log(editor.getSelection());
-				editor.replaceSelection('Sample Editor Command');
-			}
-		});
-		// This adds a complex command that can check whether the current state of the app allows execution of the command
-		this.addCommand({
-			id: 'open-sample-modal-complex',
-			name: 'Open sample modal (complex)',
-			checkCallback: (checking: boolean) => {
-				// Conditions to check
-				const markdownView = this.app.workspace.getActiveViewOfType(MarkdownView);
-				if (markdownView) {
-					// If checking is true, we're simply "checking" if the command can be run.
-					// If checking is false, then we want to actually perform the operation.
-					if (!checking) {
-						new SampleModal(this.app).open();
-					}
-
-					// This command will only show up in Command Palette when the check function returns true
-					return true;
-				}
-			}
-		});
-
-		// This adds a settings tab so the user can configure various aspects of the plugin
-		this.addSettingTab(new SampleSettingTab(this.app, this));
-
-		// If the plugin hooks up any global DOM events (on parts of the app that doesn't belong to this plugin)
-		// Using this function will automatically remove the event listener when this plugin is disabled.
-		this.registerDomEvent(document, 'click', (evt: MouseEvent) => {
-			console.log('click', evt);
-		});
-
-		// When registering intervals, this function will automatically clear the interval when the plugin is disabled.
-		this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
 	}
 
 	onunload() {
 
 	}
 
-	async loadSettings() {
-		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
-	}
+    // Dummy text processing function
+    private process_text(text: string): string {
 
-	async saveSettings() {
-		await this.saveData(this.settings);
-	}
-}
+		// If no text was selected, return empty string
+		if (!text) {
+			return "";
+		}
 
-class SampleModal extends Modal {
-	constructor(app: App) {
-		super(app);
-	}
+		// Get the lines in the text
+		const lines: string[] = text.split('\n');
 
-	onOpen() {
-		const {contentEl} = this;
-		contentEl.setText('Woah!');
-	}
+		// Define source section headers
+		const sourceHeaders: string[] = ['Quellen', 'Sources', 'Citations:'];
 
-	onClose() {
-		const {contentEl} = this;
-		contentEl.empty();
-	}
-}
+		// Check for source section headers. If not found, return text unmodified.
+		if (!lines.some(line => sourceHeaders.includes(line.trim()))) {
+			return text;
+		}
 
-class SampleSettingTab extends PluginSettingTab {
-	plugin: MyPlugin;
+		// First pass: collect URLs from sources section
+		const urls: UrlMap = {};
+		let inSourcesSection: boolean = false;
 
-	constructor(app: App, plugin: MyPlugin) {
-		super(app, plugin);
-		this.plugin = plugin;
-	}
+		for (const line of lines) {
+			
+			if (sourceHeaders.includes(line)) {
+				inSourcesSection = true;
+				continue;
+			}
+			
+			if (inSourcesSection && line) {
+				// Find the number in brackets (part 1)
+				const numberMatch: RegExpMatchArray | null = line.match(/\[(\d+)\]/);
+				if (numberMatch) {
+					const number: string = numberMatch[1];
+					// Find the URL (part 3)
+					const urlMatch: RegExpMatchArray | null = line.match(/(https?:\/\/\S+)/);
+					if (urlMatch) {
+						const url: string = urlMatch[1].trim();
+						urls[number] = url;
+					}
+				}
+			}
+		}
 
-	display(): void {
-		const {containerEl} = this;
+		// Second pass: modify the lines
+		const modifiedLines: string[] = [];
+		inSourcesSection = false;
 
-		containerEl.empty();
+		for (const line of lines) {
+			
+			if (sourceHeaders.includes(line)) {
+				inSourcesSection = true;
+				modifiedLines.push(line);
+				continue;
+			}
+			
+			if (inSourcesSection && line) {
+				// Process sources section
+				const numberMatch: RegExpMatchArray | null = line.match(/\[(\d+)\]/);
+				if (numberMatch) {
+					const number: string = numberMatch[1];
+					const urlMatch: RegExpMatchArray | null = line.match(/(https?:\/\/\S+)/);
+					if (urlMatch) {
+						const url: string = urlMatch[1].trim();
+						const textStart: number = line.indexOf(']') + 1;
+						const textEnd: number = line.indexOf('http');
+						
+						if (textStart > 0 && textEnd > 0) {
+							const text: string = line.slice(textStart, textEnd).trim();
+							
+							// Only modify the line if there is text between number and URL
+							if (text) {
+								modifiedLines.push(`\\[${number}\\] [${text}](${url})`);
+							} else {
+								modifiedLines.push(`\\[${number}\\] ${url}`);
+							}
+							continue;
+						}
+					}
+				}
+				// Keep line unchanged if no text between number and URL or if parsing failed
+				modifiedLines.push(line);
+			} else {
+				// Process lines before sources section
+				let currentLine: string = line;
+				
+				for (const [number, url] of Object.entries(urls)) {
+					currentLine = currentLine.replace(
+						`[${number}]`,
+						`[\`[${number}]\`](${url})`
+					);
+				}
+				
+				modifiedLines.push(currentLine);
+			}
+		}
 
-		new Setting(containerEl)
-			.setName('Setting #1')
-			.setDesc('It\'s a secret')
-			.addText(text => text
-				.setPlaceholder('Enter your secret')
-				.setValue(this.plugin.settings.mySetting)
-				.onChange(async (value) => {
-					this.plugin.settings.mySetting = value;
-					await this.plugin.saveSettings();
-				}));
-	}
+        return modifiedLines.join('\n');
+    }
+	
 }
