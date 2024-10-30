@@ -13,7 +13,7 @@ It is intentional that the plugin does not process the entire Obsidian file but 
 
 ## The issue
 
-References in answers from Perplexity (web page or MacOS app) are specified as numbers sourrounded by rectangular brackets in the text, such as \[1\]. Obsidian interpretes this construct as an external link, but since there is no URL attached, clicking on the link has no effect. Even worse, if there are multiple consecutive references in the text, such as \[1\]\[2\], then Obsidian displays only the first number.
+References in answers from Perplexity (web page or MacOS app) are specified as numbers surrounded by rectangular brackets in the text, such as \[1\]. Obsidian interpretes this construct as an external link, but since there is no URL attached, clicking on the link has no effect. Even worse, if there are multiple consecutive references in the text, such as \[1\]\[2\], then Obsidian displays only the first number.
 
 The full references are listed at the end of the response. This section is initiated with a line called "Citations:" (in the Web version) or "Sources" or "Quellen" (in the German desktop version). The subsequent lines again have numbers surrounded by brackets at the beginning of each line, followed by the actual reference. Also here, the numbers are interpreted as external links that lead nowhere.
 
