@@ -5,14 +5,17 @@ interface UrlMap {
 	[key: string]: string;
 }
 
+// Interface for storing plugin settings
 interface PerplexityConverterSettings {
 	sourceHeaders: string[];
 }
 
+// Default plugin settings
 const DEFAULT_SETTINGS: PerplexityConverterSettings = {
 	sourceHeaders: ['Quellen', 'Sources', 'Citations:']
 }
 
+// The plugin class
 export default class PerplexityConverter extends Plugin {
 	settings: PerplexityConverterSettings;
 
@@ -35,7 +38,7 @@ export default class PerplexityConverter extends Plugin {
 			}
 		});
 
-		// This adds a settings tab so the user can configure various aspects of the plugin
+		// This adds a settings tab so the user can configure the plugin settings
 		this.addSettingTab(new PerplexityConverterSettingTab(this.app, this));
 	}
 
@@ -44,7 +47,7 @@ export default class PerplexityConverter extends Plugin {
 	}
 
 
-    // Dummy text processing function
+    // Text processing function
     private process_text(text: string): string {
 
 		// If no text was selected, return empty string
@@ -72,11 +75,11 @@ export default class PerplexityConverter extends Plugin {
 			}
 			
 			if (inSourcesSection && line) {
-				// Find the number in brackets (part 1)
+				// Find the number in brackets
 				const numberMatch: RegExpMatchArray | null = line.match(/\[(\d+)\]/);
 				if (numberMatch) {
 					const number: string = numberMatch[1];
-					// Find the URL (part 3)
+					// Find the URL
 					const urlMatch: RegExpMatchArray | null = line.match(/(https?:\/\/\S+)/);
 					if (urlMatch) {
 						const url: string = urlMatch[1].trim();
@@ -112,7 +115,9 @@ export default class PerplexityConverter extends Plugin {
 						if (textStart > 0 && textEnd > 0) {
 							const text: string = line.slice(textStart, textEnd).trim();
 							
-							// Only modify the line if there is text between number and URL
+							// If there was text preceding the URL, make the text a hyperlink with
+							// the URL as the target. Otherwise, just leave the plain URL unmodified,
+							// the URL will then be displayed as a clickable link by Obsidian.
 							if (text) {
 								modifiedLines.push(`\\[${number}\\] [${text}](${url})`);
 							} else {
@@ -122,12 +127,13 @@ export default class PerplexityConverter extends Plugin {
 						}
 					}
 				}
-				// Keep line unchanged if no text between number and URL or if parsing failed
+				// Keep line unchanged if no reference line was found
 				modifiedLines.push(line);
 			} else {
 				// Process lines before sources section
 				let currentLine: string = line;
 				
+				// Make the reference number a clickable link with the corresponding URL as target.
 				for (const [number, url] of Object.entries(urls)) {
 					currentLine = currentLine.replace(
 						`[${number}]`,
@@ -152,7 +158,7 @@ export default class PerplexityConverter extends Plugin {
 }
 
 
-
+// The plugin settings tab class
 class PerplexityConverterSettingTab extends PluginSettingTab {
 	plugin: PerplexityConverter;
 

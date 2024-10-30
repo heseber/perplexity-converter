@@ -22,7 +22,7 @@ The full references are listed at the end of the response. This section is initi
 This plugin:
 - in the text section
   - transforms reference numbers in the text to clickable links that lead to the external references
-- in the reference secton
+- in the reference section
   - modifies the reference numbers in the references section so that the numbers are no longer hyperlinks leading nowhere but instead just normal text
   - adds hyperlinks right of the reference numbers that lead to the external references.
 
