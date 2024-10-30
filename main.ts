@@ -169,7 +169,7 @@ class PerplexityConverterSettingTab extends PluginSettingTab {
 		new Setting(containerEl)
 			.setName('References start line tags')
 			.setDesc('Strings (complete lines) that indicate the start of the references section')
-			.addText(text => text
+			.addTextArea(text => text
 				.setPlaceholder('Enter your start line tags')
 				.setValue(this.plugin.settings.sourceHeaders.join("\n"))
 				.onChange(async (value) => {
