@@ -1,96 +1,32 @@
-# Obsidian Sample Plugin
+# Perplexity Converter Plugin
 
-This is a sample plugin for Obsidian (https://obsidian.md).
+This plugin can be used to fix the references (sources) in Perplexity output that is pasted into Obsidian notes.
 
-This project uses TypeScript to provide type checking and documentation.
-The repo depends on the latest plugin API (obsidian.d.ts) in TypeScript Definition format, which contains TSDoc comments describing what it does.
+## Usage:
 
-**Note:** The Obsidian API is still in early alpha and is subject to change at any time!
+1. Select the pasted text in the Obsidian note
+2. Call the plugin (Cmd-P Perplexity)
 
-This sample plugin demonstrates some of the basic functionality the plugin API can do.
-- Adds a ribbon icon, which shows a Notice when clicked.
-- Adds a command "Open Sample Modal" which opens a Modal.
-- Adds a plugin setting tab to the settings page.
-- Registers a global click event and output 'click' to the console.
-- Registers a global interval which logs 'setInterval' to the console.
+This will replace the selection with the fixed text. See below for details.
 
-## First time developing plugins?
+It is intentional that the plugin does not process the entire Obsidian file but only the selection because you may have a note that already has a previously fixed response from Perplexity or some other text, and later add another response from Perplexity to the same note. Fixing the entire note would then break things because it would try to re-process the original first response that was already fixed.
 
-Quick starting guide for new plugin devs:
+## The issue
 
-- Check if [someone already developed a plugin for what you want](https://obsidian.md/plugins)! There might be an existing plugin similar enough that you can partner up with.
-- Make a copy of this repo as a template with the "Use this template" button (login to GitHub if you don't see it).
-- Clone your repo to a local development folder. For convenience, you can place this folder in your `.obsidian/plugins/your-plugin-name` folder.
-- Install NodeJS, then run `npm i` in the command line under your repo folder.
-- Run `npm run dev` to compile your plugin from `main.ts` to `main.js`.
-- Make changes to `main.ts` (or create new `.ts` files). Those changes should be automatically compiled into `main.js`.
-- Reload Obsidian to load the new version of your plugin.
-- Enable plugin in settings window.
-- For updates to the Obsidian API run `npm update` in the command line under your repo folder.
+References in answers from Perplexity (web page or MacOS app) are specified as numbers sourrounded by rectangular brackets in the text, such as \[1\]. Obsidian interpretes this construct as an external link, but since there is no URL attached, clicking on the link has no effect. Even worse, if there are multiple consecutive references in the text, such as \[1\]\[2\], then Obsidian displays only the first number.
 
-## Releasing new releases
+The full references are listed at the end of the response. This section is initiated with a line called "Citations:" (in the Web version) or "Sources" or "Quellen" (in the German desktop version). The subsequent lines again have numbers surrounded by brackets at the beginning of each line, followed by the actual reference. Also here, the numbers are interpreted as external links that lead nowhere.
 
-- Update your `manifest.json` with your new version number, such as `1.0.1`, and the minimum Obsidian version required for your latest release.
-- Update your `versions.json` file with `"new-plugin-version": "minimum-obsidian-version"` so older versions of Obsidian can download an older version of your plugin that's compatible.
-- Create new GitHub release using your new version number as the "Tag version". Use the exact version number, don't include a prefix `v`. See here for an example: https://github.com/obsidianmd/obsidian-sample-plugin/releases
-- Upload the files `manifest.json`, `main.js`, `styles.css` as binary attachments. Note: The manifest.json file must be in two places, first the root path of your repository and also in the release.
-- Publish the release.
+## The solution
 
-> You can simplify the version bump process by running `npm version patch`, `npm version minor` or `npm version major` after updating `minAppVersion` manually in `manifest.json`.
-> The command will bump version in `manifest.json` and `package.json`, and add the entry for the new version to `versions.json`
+This plugin:
+- in the text section
+  - transforms reference numbers in the text to clickable links that lead to the external references
+- in the reference secton
+  - modifies the reference numbers in the references section so that the numbers are no longer hyperlinks leading nowhere but instead just normal text
+  - adds hyperlinks right of the reference numbers that lead to the external references.
 
-## Adding your plugin to the community plugin list
+## Settings
 
-- Check the [plugin guidelines](https://docs.obsidian.md/Plugins/Releasing/Plugin+guidelines).
-- Publish an initial version.
-- Make sure you have a `README.md` file in the root of your repo.
-- Make a pull request at https://github.com/obsidianmd/obsidian-releases to add your plugin.
+The plugin settings can be used to add additional tag lines that define the beginning of the reference section for your own language.
 
-## How to use
-
-- Clone this repo.
-- Make sure your NodeJS is at least v16 (`node --version`).
-- `npm i` or `yarn` to install dependencies.
-- `npm run dev` to start compilation in watch mode.
-
-## Manually installing the plugin
-
-- Copy over `main.js`, `styles.css`, `manifest.json` to your vault `VaultFolder/.obsidian/plugins/your-plugin-id/`.
-
-## Improve code quality with eslint (optional)
-- [ESLint](https://eslint.org/) is a tool that analyzes your code to quickly find problems. You can run ESLint against your plugin to find common bugs and ways to improve your code. 
-- To use eslint with this project, make sure to install eslint from terminal:
-  - `npm install -g eslint`
-- To use eslint to analyze this project use this command:
-  - `eslint main.ts`
-  - eslint will then create a report with suggestions for code improvement by file and line number.
-- If your source code is in a folder, such as `src`, you can use eslint with this command to analyze all files in that folder:
-  - `eslint .\src\`
-
-## Funding URL
-
-You can include funding URLs where people who use your plugin can financially support it.
-
-The simple way is to set the `fundingUrl` field to your link in your `manifest.json` file:
-
-```json
-{
-    "fundingUrl": "https://buymeacoffee.com"
-}
-```
-
-If you have multiple URLs, you can also do:
-
-```json
-{
-    "fundingUrl": {
-        "Buy Me a Coffee": "https://buymeacoffee.com",
-        "GitHub Sponsor": "https://github.com/sponsors",
-        "Patreon": "https://www.patreon.com/"
-    }
-}
-```
-
-## API Documentation
-
-See https://github.com/obsidianmd/obsidian-api
