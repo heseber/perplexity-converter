@@ -178,11 +178,9 @@ class PerplexityConverterSettingTab extends PluginSettingTab {
 			.addTextArea(text => text
 				.setPlaceholder('Enter your start line tags')
 				.setValue(this.plugin.settings.sourceHeaders.join("\n"))
-				.then(textArea => {
-					textArea.inputEl.style.minHeight = "70px";
-					textArea.inputEl.style.minWidth = "200px";
-					textArea.inputEl.style.resize = "none";
-				})
+                .then(textArea => {
+                    textArea.inputEl.addClass('reference-start-line-tags-textarea');
+                })
 				.onChange(async (value) => {
 					this.plugin.settings.sourceHeaders = value.trimEnd().split('\n').filter(item => item.trim());
 					await this.plugin.saveSettings();

@@ -1,7 +1,7 @@
 {
 	"id": "perplexity-converter",
 	"name": "Perplexity Converter",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"minAppVersion": "0.15.0",
 	"description": "Fixes source references in Perplexity output pasted into Obsidian.",
 	"author": "Henrik Seidel",
