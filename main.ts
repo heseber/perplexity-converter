@@ -135,7 +135,7 @@ export default class PerplexityConverter extends Plugin {
 				
 				// Make the reference number a clickable link with the corresponding URL as target.
 				for (const [number, url] of Object.entries(urls)) {
-					currentLine = currentLine.replace(
+					currentLine = currentLine.replaceAll(
 						`[${number}]`,
 						`[\`[${number}]\`](${url})`
 					);
