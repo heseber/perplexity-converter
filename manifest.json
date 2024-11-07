@@ -3,7 +3,7 @@
 	"name": "Perplexity Converter",
 	"version": "1.0.3",
 	"minAppVersion": "0.15.0",
-	"description": "Fixes source references in Perplexity output pasted into Obsidian.",
+	"description": "Fix references in text pasted from Perplexity.",
 	"author": "Henrik Seidel",
 	"authorUrl": "https://github.com/heseber/",
 	"isDesktopOnly": false
