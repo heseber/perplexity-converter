@@ -1,6 +1,6 @@
 {
 	"name": "perplexity-converter",
-	"version": "1.0.3",
+	"version": "1.0.4",
 	"description": "This is a plugin for fixing references in text pasted from Perplexity",
 	"main": "main.js",
 	"scripts": {
