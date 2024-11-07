@@ -25,7 +25,7 @@ export default class PerplexityConverter extends Plugin {
 		// Register the command
 		this.addCommand({
 			id: 'process-selected-text',
-			name: 'Process Selected Text',
+			name: 'Process selected text',
 			editorCallback: (editor: Editor) => {
 				// Get the selected text
 				const selectedText = editor.getSelection();
