@@ -1,7 +1,6 @@
 {
 	"id": "perplexity-converter",
 	"name": "Perplexity Converter",
-	"version": "1.0.5",
 	"minAppVersion": "0.15.0",
 	"description": "Fix references in text pasted from Perplexity.",
 	"author": "Henrik Seidel",

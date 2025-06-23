@@ -9,6 +9,8 @@ This plugin can be used to fix the references (sources) in Perplexity output tha
 
 This will replace the selection with the fixed text. See below for details.
 
+**Note for iOS/iPadOS users**: If you have the "Auto-select all text on mobile" setting enabled, the plugin will automatically select all text in the note if no text is currently selected, making it easier to process entire notes on mobile devices.
+
 It is intentional that the plugin does not process the entire Obsidian file but only the selection because you may have a note that already has a previously fixed response from Perplexity or some other text, and later add another response from Perplexity to the same note. Fixing the entire note would then break things because it would try to re-process the original first response that was already fixed.
 
 ## The issue
@@ -28,5 +30,10 @@ This plugin:
 
 ## Settings
 
-The plugin settings can be used to add additional tag lines that define the beginning of the reference section for your own language.
+### Reference start line tags
+
+This setting can be used to add additional tag lines that define the beginning of the reference section for your own language.
+
+### Auto-select all text on mobile
+When enabled, automatically selects all text in the note on iOS/iPadOS if no text is currently selected. This makes it easier to process entire notes on mobile devices without having to manually select all text first.
 

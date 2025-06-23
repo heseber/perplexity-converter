@@ -8,11 +8,21 @@ interface UrlMap {
 // Interface for storing plugin settings
 interface PerplexityConverterSettings {
 	sourceHeaders: string[];
+	autoSelectOnMobile: boolean;
 }
 
 // Default plugin settings
 const DEFAULT_SETTINGS: PerplexityConverterSettings = {
-	sourceHeaders: ['Quellen', 'Sources', 'Citations:']
+	sourceHeaders: ['Quellen', 'Sources', 'Citations:'],
+	autoSelectOnMobile: true
+}
+
+// Platform detection function
+function isIOSOrIPadOS(): boolean {
+	if (typeof navigator === 'undefined') return false;
+	
+	const userAgent = navigator.userAgent.toLowerCase();
+	return userAgent.includes('iphone') || userAgent.includes('ipad') || userAgent.includes('ipod');
 }
 
 // The plugin class
@@ -28,7 +38,17 @@ export default class PerplexityConverter extends Plugin {
 			name: 'Process selected text',
 			editorCallback: (editor: Editor) => {
 				// Get the selected text
-				const selectedText = editor.getSelection();
+				let selectedText = editor.getSelection();
+				
+				// If no text is selected and we're on iOS/iPadOS with auto-select enabled
+				if (!selectedText && isIOSOrIPadOS() && this.settings.autoSelectOnMobile) {
+					// Select all text in the editor
+					const fullText = editor.getValue();
+					if (fullText) {
+						editor.setSelection({ line: 0, ch: 0 }, { line: editor.lineCount() - 1, ch: editor.getLine(editor.lineCount() - 1).length });
+						selectedText = fullText;
+					}
+				}
 				
 				// Process the text
 				const processedText = this.process_text(selectedText);
@@ -183,6 +203,16 @@ class PerplexityConverterSettingTab extends PluginSettingTab {
                 })
 				.onChange(async (value) => {
 					this.plugin.settings.sourceHeaders = value.trimEnd().split('\n').filter(item => item.trim());
+					await this.plugin.saveSettings();
+				}));
+
+		new Setting(containerEl)
+			.setName('Auto-select all text on mobile')
+			.setDesc('When enabled, automatically selects all text in the note on iOS/iPadOS if no text is currently selected')
+			.addToggle(toggle => toggle
+				.setValue(this.plugin.settings.autoSelectOnMobile)
+				.onChange(async (value) => {
+					this.plugin.settings.autoSelectOnMobile = value;
 					await this.plugin.saveSettings();
 				}));
 	}
