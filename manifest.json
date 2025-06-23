@@ -2,6 +2,7 @@
 	"id": "perplexity-converter",
 	"name": "Perplexity Converter",
 	"minAppVersion": "0.15.0",
+	"version": "1.0.6",
 	"description": "Fix references in text pasted from Perplexity.",
 	"author": "Henrik Seidel",
 	"authorUrl": "https://github.com/heseber/",
